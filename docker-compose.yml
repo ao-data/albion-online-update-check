@@ -1,0 +1,11 @@
+version: "3"
+services:
+  update-check:
+    build: 
+      context: .
+    environment:
+      ADDITIONAL_MESSAGE_CONTENT: ""
+      DISCORD_WEBHOOK_URL: ""
+    volumes:
+      - ./src/:/usr/src/app
+    command: sleep infinity
