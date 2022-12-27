@@ -64,4 +64,8 @@ def isUpdated():
     # send a message to discord
     sendDiscordWebhook(content)
 
+if os.environ.get('DISCORD_WEBHOOK_URL') is None or os.environ.get('DISCORD_WEBHOOK_URL') == "":
+    print("Environment variable DISCORD_WEBHOOK_URL must be set.")
+    exit(1)
+
 isUpdated()
