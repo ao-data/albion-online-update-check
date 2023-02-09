@@ -1,24 +1,19 @@
 import urllib.request
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 import requests
 import os
+import xmltodict
 
-def getVersionAndLink():
-    url = "https://albiononline.com/en/changelog"
+def getWin32FullInstallFilename():
+    url = "https://live.albiononline.com/autoupdate/manifest.xml"
     fp = urllib.request.urlopen(url)
     mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
+    xmldata = mybytes.decode("utf8")
     fp.close()
 
-    soup = BeautifulSoup(mystr, 'html.parser')
+    fullInstallFilename = xmltodict.parse(xmldata)['patchsitemanifest']['albiononline']['win32']['fullinstall']['@file']
 
-    changelog_title_path = ".content__body--updates h2"
-    changelog_title = soup.select(changelog_title_path)[0].text
-
-    changelog_link_path = ".sidebar-item--active a"
-    changelog_link = "https://albiononline.com%s" % soup.select(changelog_link_path)[0]['href']
-
-    return [changelog_title, changelog_link]
+    return fullInstallFilename
 
 
 def sendDiscordWebhook(content):
@@ -27,8 +22,8 @@ def sendDiscordWebhook(content):
 
 def isUpdated():
     # get current title and url of changelogs
-    title, url = getVersionAndLink()
-    thisUpdate = "%s - %s" % (title, url)
+    fullInstallFilename = getWin32FullInstallFilename()
+    thisUpdate = fullInstallFilename
 
     # local file to keep track of the last changelog title and url
     path = "%s/config/lastupdate.txt" % os.path.dirname(__file__)
@@ -53,7 +48,7 @@ def isUpdated():
     if additionalContent == None:
         additionalContent = ""
 
-    content = "Albion Online had an update! %s. %s" % (thisUpdate, additionalContent)
+    content = "Albion Online had an update! Win32 Full Installer Filename %s. %s" % (thisUpdate, additionalContent)
     print(content)
 
     # write the latest changelog url+title to the local file
